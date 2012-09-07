@@ -101,6 +101,7 @@ BibTeX python script.\n\n""")
         D.citationKey,
         D.title,
         D.type,
+        D.doi,
         D.publisher,
         D.publication,
         D.volume,
@@ -147,6 +148,7 @@ BibTeX python script.\n\n""")
     volume    = "{entry[volume]}",
     pages     = "{entry[pages]}",
     year      = "{entry[year]}",
+    doi       = "{entry[doi]}",
     localfile = "{entry[localUrl]}"
 }}'''.format(entry=entry)
 
@@ -159,6 +161,7 @@ BibTeX python script.\n\n""")
     publisher = "{entry[publisher]}",
     year      = "{entry[year]}",
     volume    = "{entry[volume]}",
+    doi       = "{entry[doi]}",
     localfile = "{entry[localUrl]}"
 }}'''.format(entry=entry)
 
