@@ -26,7 +26,9 @@ Desktop/your@email.com@www.mendeley.com.sqlite
 
     Make a copy of this file, as we assume no responsability for loss of data.
 
-    Then run mendeley2bibtex.py on your file:
+    Then run mendeley2bibtex.py on your file with
+
+        ./mendeley2bibtex.py -o mendeley.bib mendeley.sqlite
 
 
     \section Copyright
@@ -111,11 +113,11 @@ BibTeX python script.\n\n""")
         D.pages,
         F.localUrl
     FROM Documents D
-    JOIN DocumentCanonicalIds DCI
+    LEFT JOIN DocumentCanonicalIds DCI
         ON D.id = DCI.documentId
-    JOIN DocumentFiles DF
+    LEFT JOIN DocumentFiles DF
         ON D.id = DF.documentId
-    JOIN Files F
+    LEFT JOIN Files F
         ON F.hash = DF.hash
     WHERE D.confirmed = "true"
     GROUP BY D.citationKey
@@ -184,7 +186,7 @@ def main() :
     global version
 
     parser = OptionParser(usage='''
-  usage: %prog [mendeley.sqlite] -o [out.bib]''',version='%prog '+version)
+  usage: %prog [-o out.bib] mendeley.sqlite''',version='%prog '+version)
 
     parser.add_option('-q', '--quiet', action='store_true', default=False,
                 dest='quiet', help='Do not display information.')
