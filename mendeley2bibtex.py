@@ -64,8 +64,28 @@ import sqlite3
 
 version = '0.01'
 
+def clean_char(entry):
+    """A helper function to convert special characters to LaTeX characters"""
+
+    # List of char and replacement, add your own list below
+    char_to_replace = {
+        # LaTeX special char
+        '&':'\&',
+        # UTF8 not understood by inputenc
+        u'–':'--', # utf8 2014, special dash
+        u'—':'--', # utf8 2013, special dash
+        u'∕':'/',  # utf8 2215, math division
+        }
+
+    # Which field shall we check and convert
+    entry_key=['publisher','publication','title']
+
+    for k in entry_key:
+        for char, repl_char in char_to_replace.iteritems():
+            entry[k] = entry[k].replace(char,repl_char)
+
 def dict_factory(cursor, row):
-    """A class to use the SQLite row as dict for string formatting"""
+    """A function to use the SQLite row as dict for string formatting"""
     d = {}
     for idx, col in enumerate(cursor.description):
         if row[idx]:
@@ -136,6 +156,7 @@ BibTeX python script.\n\n""")
             authors.append(', '.join(author))
         entry['authors'] = ' and '.join(authors)
 
+        clean_char(entry)
 
         # If you need to add more templates:
         #    all types of templates are available at
@@ -155,6 +176,19 @@ BibTeX python script.\n\n""")
 }}'''.format(entry=entry)
 
 
+        elif "ConferenceProceedings" == entry['type']:
+            formatted_entry = u'''
+@proceedings{{{entry[citationKey]},
+    author    = "{entry[authors]}",
+    title     = "{entry[title]}",
+    publisher = "{entry[publisher]}",
+    pages     = "{entry[pages]}",
+    year      = "{entry[year]}",
+    doi       = "{entry[doi]}",
+    localfile = "{entry[localUrl]}"
+}}'''.format(entry=entry)
+
+
         elif "Book" == entry['type']:
             formatted_entry = u'''
 @book{{{entry[citationKey]},
@@ -166,7 +200,6 @@ BibTeX python script.\n\n""")
     doi       = "{entry[doi]}",
     localfile = "{entry[localUrl]}"
 }}'''.format(entry=entry)
-
 
         else:
             if not quiet:
