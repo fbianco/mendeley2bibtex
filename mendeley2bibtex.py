@@ -75,6 +75,8 @@ def clean_char(entry):
         u'–':'--', # utf8 2014, special dash
         u'—':'--', # utf8 2013, special dash
         u'∕':'/',  # utf8 2215, math division
+        u'κ':'k', # Greek kappa
+        u'×':'x', # times
         }
 
     # Which field shall we check and convert
