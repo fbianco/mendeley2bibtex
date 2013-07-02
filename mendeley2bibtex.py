@@ -61,6 +61,7 @@ francois.bianco@unige.ch
 import sys
 from optparse import OptionParser
 import sqlite3
+import re
 
 version = '0.01'
 
@@ -85,6 +86,50 @@ def clean_char(entry):
     for k in entry_key:
         for char, repl_char in char_to_replace.iteritems():
             entry[k] = entry[k].replace(char,repl_char)
+
+#from string import capwords
+def capwords(s):
+    """Reimplement a custom capitalize word function which keeps words
+unchanged except the first letter (useful for chemical compounds and
+special abreviation with capital letter within the word) and which capitalizes
+both words of hyphenated words."""
+
+    for sep in (' ', '-'):
+       s = sep.join( x[0].capitalize()+x[1:] \
+                for x in s.split(sep) if x )
+
+    ## Expanded version for tests/debugging ;-)
+    #for sep in (' ', '-'):
+        #new_w = []
+        #for w in s.split(sep):
+            #if not w:
+                #continue
+            #new_w.append( w[0].capitalize()+w[1:] )
+        #s = sep.join(new_w)
+    return s
+
+def capitalize_title(entry):
+    """Helper function to convert paper title to camel case text, according
+    to ACS format : no capital on article and prepositions, hyphenated text
+have both words capitalized (except for verbs).
+
+    BUG : Even hyphenated verbs are capitalized in this version.
+          No possibility to distinguished between As for arsenic and the article
+          Or In for indium or in(side)
+
+    """
+
+    title = capwords(entry['title'])
+
+    word_not_captitalized = ['of','an','on','at', 'to', 'for', 'from', 'in','as',
+                             'by','a','with','and','the','in'] # ,'as'
+    for w in word_not_captitalized:
+        title = title.replace(' '+w.capitalize()+' ',' '+w+' ')
+        title = title.replace('-'+w.capitalize()+'-','-'+w+'-')
+
+    title = title.replace('as Atomic', 'As Atomic')
+    entry['title'] = title
+
 
 def dict_factory(cursor, row):
     """A function to use the SQLite row as dict for string formatting"""
@@ -158,6 +203,7 @@ BibTeX python script.\n\n""")
             authors.append(', '.join(author))
         entry['authors'] = ' and '.join(authors)
 
+        #capitalize_title(entry)
         clean_char(entry)
 
         # If you need to add more templates:
